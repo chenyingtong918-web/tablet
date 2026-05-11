@@ -9,6 +9,7 @@ import {
   X,
   ArrowRight,
   Loader2,
+  Wand2,
 } from 'lucide-react';
 
 type Message = {
@@ -24,6 +25,13 @@ const DEMO_IMAGES: Record<string, string> = {
   'Expanded': '/expanded.png',
   'Large': '/large.png',
   'Extra Large': '/extra-large.png',
+};
+
+const DEMO_GRID_IMAGES: Record<string, string> = {
+  'Medium': '/medium-grid.png',
+  'Expanded': '/expanded-grid.png',
+  'Large': '/large-grid.png',
+  'Extra Large': '/extra-large-grid.png',
 };
 
 const TABLET_BREAKPOINTS = [
@@ -56,6 +64,7 @@ export default function App() {
   const [isAdapting, setIsAdapting] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(TABLET_BREAKPOINTS[0].category);
+  const [isGridOpen, setIsGridOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -94,6 +103,7 @@ export default function App() {
     setPromptValue('');
     setIsAdapting(true);
     setResultImage(null);
+    setIsGridOpen(false);
 
     // 3. Add loading assistant message
     setTimeout(() => {
@@ -126,7 +136,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-full bg-white text-black font-sans overflow-hidden">
       {/* LEFT PANEL: Dialogue Form */}
-      <div className="w-[380px] shrink-0 border-r border-black flex flex-col z-20 bg-gray-50">
+      <div className="w-[380px] shrink-0 border-r border-gray-200 flex flex-col z-20 bg-gray-50">
         {/* Chat / Input Layout */}
         <main ref={scrollRef} className={`flex-1 overflow-y-auto p-8 flex flex-col gap-8 scroll-smooth bg-gray-50 ${messages.length === 0 ? 'hidden' : ''}`}>
           <AnimatePresence initial={false}>
@@ -139,10 +149,10 @@ export default function App() {
                 >
                   {/* Avatar */}
                   <div
-                    className={`w-8 h-8 shrink-0 flex items-center justify-center border border-black ${
+                    className={`w-8 h-8 shrink-0 flex items-center justify-center rounded-full ${
                       msg.role === 'assistant'
-                        ? 'bg-white text-black'
-                        : 'bg-black text-white'
+                        ? 'bg-white shadow-sm border border-gray-100 text-black'
+                        : 'bg-black text-white shadow-sm'
                     }`}
                   >
                     {msg.role === 'assistant' ? <span className="font-bold font-mono">A</span> : <span className="text-[11px] font-bold font-mono">U</span>}
@@ -163,8 +173,8 @@ export default function App() {
 
                     {/* Uploaded Image Preview */}
                     {msg.imageUrl && (
-                      <div className="mt-3 relative border border-black max-w-[200px] bg-white p-2">
-                        <img src={msg.imageUrl} alt="Uploaded draft" className="w-full h-auto object-cover border border-gray-200" />
+                      <div className="mt-3 relative border border-gray-100 max-w-[200px] bg-white p-2 rounded-2xl shadow-sm">
+                        <img src={msg.imageUrl} alt="Uploaded draft" className="w-full h-auto object-cover rounded-lg border border-gray-50" />
                       </div>
                     )}
                   </div>
@@ -183,7 +193,7 @@ export default function App() {
               </p>
             </>
           )}
-          <div className="relative border-2 border-black bg-white shadow-sm focus-within:ring-2 focus-within:ring-black transition-all p-3 flex flex-col">
+          <div className="relative border border-gray-200 rounded-2xl bg-white shadow-sm focus-within:shadow-md focus-within:border-gray-300 transition-all p-3 flex flex-col">
               
               {/* Inline Attachment Preview */}
               <AnimatePresence>
@@ -194,12 +204,12 @@ export default function App() {
                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                     className="relative self-start group"
                   >
-                    <div className="p-1 border border-black bg-gray-50 pb-0 shrink-0">
-                      <img src={selectedImage} alt="Draft" className="h-16 w-auto border border-gray-200 object-cover" />
+                    <div className="p-1 border border-gray-200 bg-gray-50 rounded-lg pb-0 shrink-0">
+                      <img src={selectedImage} alt="Draft" className="h-16 w-auto rounded object-cover" />
                     </div>
                     <button
                       onClick={() => setSelectedImage(null)}
-                      className="absolute -top-2 -right-2 bg-white text-black border border-black p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100"
+                      className="absolute -top-2 -right-2 bg-white text-black border border-gray-200 rounded-full p-0.5 shadow-sm hover:bg-gray-50 transition-colors"
                     >
                       <X size={12} strokeWidth={3} />
                     </button>
@@ -220,7 +230,7 @@ export default function App() {
                 }}
               />
 
-              <div className="flex items-center justify-between pt-3 border-t border-gray-200 mt-1">
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-1">
                 <input
                   type="file"
                   accept="image/*"
@@ -230,19 +240,17 @@ export default function App() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2 text-black border border-transparent hover:border-black transition-colors flex items-center justify-center shrink-0 bg-gray-50 text-[10px] font-bold tracking-widest gap-2 uppercase"
+                  className="px-3 py-2 text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-100 transition-all flex items-center justify-center shrink-0 text-[10px] font-bold tracking-widest gap-2 uppercase shadow-sm"
                   title="Attach mobile layout image"
                 >
-                  <div className="border border-black p-1 bg-white">
-                    <ImageIcon size={14} strokeWidth={2} />
-                  </div>
+                  <ImageIcon size={14} strokeWidth={2} />
                   <span>ATTACH TICKET</span>
                 </button>
 
                 <button
                   onClick={handleAdapt}
                   disabled={!selectedImage || isAdapting}
-                  className="bg-black text-white px-5 py-2 text-[10px] font-bold tracking-[0.2em] uppercase flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-900 transition-colors"
+                  className="bg-black text-white rounded-full px-5 py-2 text-[10px] font-bold tracking-[0.2em] uppercase flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shadow-sm"
                 >
                   ADAPT <ArrowRight size={14} />
                 </button>
@@ -261,19 +269,24 @@ export default function App() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex-none border-b border-black bg-gray-50 flex overflow-x-auto custom-scrollbar z-30"
+              className="flex-none bg-white flex overflow-x-auto p-4 custom-scrollbar z-30 justify-center border-b border-gray-100"
             >
-              {TABLET_BREAKPOINTS.map((bp) => (
-                <button 
-                  key={bp.category} 
-                  onClick={() => setSelectedCategory(bp.category)}
-                  className={`px-8 py-4 border-r border-black transition-colors min-w-[200px] text-left hover:bg-gray-100 ${
-                    selectedCategory === bp.category ? 'bg-white shadow-[inset_0_-2px_0_0_black]' : 'text-gray-500'
-                  }`}
-                >
-                  <span className="text-xs font-bold tracking-widest uppercase">{bp.category}</span>
-                </button>
-              ))}
+              <div className="flex bg-gray-100 p-1 rounded-full w-max shadow-inner">
+                {TABLET_BREAKPOINTS.map((bp) => (
+                  <button 
+                    key={bp.category} 
+                    onClick={() => {
+                      setSelectedCategory(bp.category);
+                      setIsGridOpen(false);
+                    }}
+                    className={`px-6 py-2 rounded-full transition-all text-center ${
+                      selectedCategory === bp.category ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-900'
+                    }`}
+                  >
+                    <span className="text-[11px] font-bold tracking-widest uppercase">{bp.category}</span>
+                  </button>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -288,11 +301,9 @@ export default function App() {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 flex flex-col items-center justify-center z-10 text-gray-500 bg-white"
               >
-                <div className="aspect-[9/16] w-[200px] border-2 border-dashed border-black flex flex-col items-center justify-center bg-gray-50 p-4 relative group opacity-50">
-                  <div className="text-center">
-                    <div className="mb-2 text-2xl font-light">+</div>
-                    <p className="text-[10px] font-bold tracking-tight uppercase text-black">AWAITING INPUT DRAFT</p>
-                  </div>
+                <div className="flex flex-col items-center justify-center text-gray-300">
+                  <Wand2 size={48} strokeWidth={1} className="mb-4" />
+                  <p className="text-xs font-medium tracking-widest uppercase">WAITING TO CREATE</p>
                 </div>
               </motion.div>
             )}
@@ -330,10 +341,13 @@ export default function App() {
                     {TABLET_BREAKPOINTS.find(b => b.category === selectedCategory)?.devices}
                   </p>
                   <div className="flex items-center gap-3 mt-4">
-                    <button className="border border-black bg-white text-black px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-50 transition-colors">
-                      OPEN GRID
+                    <button 
+                      onClick={() => setIsGridOpen(!isGridOpen)}
+                      className="border border-gray-200 bg-white text-black px-5 py-2.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-50 shadow-sm transition-colors"
+                    >
+                      {isGridOpen ? 'CLOSE GRID' : 'OPEN GRID'}
                     </button>
-                    <button className="bg-black text-white px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-900 transition-colors">
+                    <button className="bg-black text-white px-5 py-2.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 shadow-sm transition-colors">
                       CREATE FIGMA
                     </button>
                   </div>
@@ -341,16 +355,16 @@ export default function App() {
                 
                 <div className="w-full h-full pb-24 flex items-center justify-center pt-8">
                   <motion.div
-                    key={selectedCategory}
+                    key={selectedCategory + (isGridOpen ? '-grid' : '')}
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="w-full max-w-5xl mx-auto border border-black p-4 bg-gray-50 flex items-center justify-center relative min-h-[60vh]"
+                    className="w-full max-w-5xl mx-auto border border-gray-100 rounded-[2rem] p-4 bg-gray-50/50 flex items-center justify-center relative min-h-[60vh] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
                   >
                     <img 
-                      src={DEMO_IMAGES[selectedCategory] || resultImage!} 
+                      src={isGridOpen ? (DEMO_GRID_IMAGES[selectedCategory] || DEMO_IMAGES[selectedCategory] || resultImage!) : (DEMO_IMAGES[selectedCategory] || resultImage!)} 
                       alt={`${selectedCategory} layout target`}
-                      className="max-h-[70vh] w-auto border border-black shadow-sm object-contain bg-white transition-opacity duration-300"
+                      className="max-h-[70vh] w-auto rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] bg-white transition-opacity duration-300"
                     />
                   </motion.div>
                 </div>
