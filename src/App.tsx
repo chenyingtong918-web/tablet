@@ -329,6 +329,14 @@ export default function App() {
                   <p className="text-xs text-gray-500 mt-1">
                     {TABLET_BREAKPOINTS.find(b => b.category === selectedCategory)?.devices}
                   </p>
+                  <div className="flex items-center gap-3 mt-4">
+                    <button className="border border-black bg-white text-black px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-50 transition-colors">
+                      OPEN GRID
+                    </button>
+                    <button className="bg-black text-white px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-900 transition-colors">
+                      CREATE FIGMA
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="w-full h-full pb-24 flex items-center justify-center pt-8">
